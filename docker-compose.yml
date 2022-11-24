@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+
+  api:
+    build:
+      context: ./
+      dockerfile: ./docker/api/Dockerfile
+    container_name: lgu_plus_async_api
+    restart: unless-stopped
+    command: "python -m uvicorn main:app --reload --host 0.0.0.0 --port 4110"
+    volumes: 
+      - .:/app
+    ports:
+      - 4110:4110
+    env_file:
+      - .env
+    environment:
+      - TRITON_URL=${TRITON_URL}
+    ipc: "host"
+    network_mode: "host"
+    depends_on:
+      - redis
+      - rabbitmq
+  
+  worker:
+    build:
+      context: ./
+      dockerfile: ./docker/api/Dockerfile
+    container_name: lgu_plus_async_worker
+    restart: unless-stopped
+    command: "celery -A components.worker.celery_worker worker --without-heartbeat --without-mingle -P solo -l info -E --concurrency=1 -Ofair"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - TRITON_URL=${TRITON_URL}
+    ipc: "host"
+    network_mode: "host"
+    depends_on:
+      - redis
+      - rabbitmq
+
+  redis:
+    image: redis
+    command: --port 9654
+    container_name: lgu_plus_async_redis
+    restart: unless-stopped
+    ports:
+    - "9654:9654"
+    
+  rabbitmq:
+    build:
+      context: ./docker/rabbitmq
+      dockerfile: Dockerfile
+    container_name: lgu_plus_async_rabbitmq
+    restart: unless-stopped
+    ports:
+      - "1070:1070"
+
+

@@ -1,0 +1,1 @@
+{"progress": "upload", "SR_folder_path": "str", "done": 0, "total": 0, "state": "null"}

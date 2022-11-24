@@ -1,0 +1,1 @@
+{"progress": "model", "SR_folder_path": "/app/static/sr_images/0ee62d3a-7fdc-4d1f-b7e0-75814195e1a1", "done": 200, "total": 499, "state": "ABORTED"}
